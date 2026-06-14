@@ -1,0 +1,59 @@
+package com.example.rmaprojekat2
+
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.rmaprojekat2.ui.details.DetailScreen
+import com.example.rmaprojekat2.ui.details.DetailViewModel
+import com.example.rmaprojekat2.ui.home.HomeScreen
+import com.example.rmaprojekat2.ui.home.HomeViewModel
+import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+
+@Serializable
+internal object HomeNode
+
+@Serializable
+internal data class DetailNode(val movieKey: String)
+
+@Composable
+fun App() {
+    val navHandler = rememberNavController()
+
+    MaterialTheme {
+        NavHost(navController = navHandler, startDestination = HomeNode) {
+            composable<HomeNode> {
+                val vm = koinViewModel<HomeViewModel>()
+                HomeScreen(
+                    state = vm.uiState,
+                    onAction = vm::dispatch,
+                    onNavigateToDetail = { movieId ->
+                        navHandler.navigate(DetailNode(movieKey = movieId)) {
+                            launchSingleTop = true
+                            restoreState = true
+                            popUpTo(navHandler.graph.findStartDestination().id) { saveState = true }
+                        }
+                    },
+                    sideEffects = vm.sideEffects
+                )
+            }
+
+            composable<DetailNode> { backStackEntry ->
+                val detailNode = backStackEntry.toRoute<DetailNode>()
+                val movieId = detailNode.movieKey
+                val vm = koinViewModel<DetailViewModel> { parametersOf(movieId) }
+                DetailScreen(
+                    state = vm.uiState,
+                    onAction = vm::dispatch,
+                    onGoBack = { navHandler.popBackStack() },
+                    sideEffects = vm.sideEffects
+                )
+            }
+        }
+    }
+}
