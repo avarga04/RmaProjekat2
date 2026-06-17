@@ -11,6 +11,7 @@ actual fun databaseModule(): Module = module {
             get(),
             MovieDB::class.java,
             "movies_database"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 }

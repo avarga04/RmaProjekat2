@@ -32,6 +32,9 @@ interface MovieDao {
     @Upsert
     suspend fun storeGenres(items: List<CategoryEntry>)
 
+    @Upsert
+    suspend fun insertQuizResult(result: QuizResultEntity)
+
     @Query("DELETE FROM cast_members WHERE movieId = :movieId")
     suspend fun eraseCast(movieId: String)
 
@@ -40,6 +43,35 @@ interface MovieDao {
 
     @Query("DELETE FROM movie_images WHERE movieId = :movieId")
     suspend fun eraseImages(movieId: String)
+
+    @Query("""
+    SELECT * FROM movies 
+    WHERE posterUrl IS NOT NULL 
+    AND backdropUrl IS NOT NULL
+    ORDER BY imdbRating DESC
+""")
+    fun getMoviesForQuiz(): Flow<List<MovieEntry>>
+
+    @Query(""" SELECT * FROM movies WHERE id = :movieId""")
+    suspend fun getMovieById(movieId: String): MovieEntry?
+
+    @Query("""SELECT * FROM movies WHERE id IN(SELECT movieId FROM cast_members GROUP BY movieId HAVING COUNT(*) >= 3)
+        AND posterUrl IS NOT NULL
+        ORDER BY imdbRating DESC
+    """)
+    fun getMoviesWithCastForQuiz(): Flow<List<MovieEntry>>
+
+    @Query("""SELECT * FROM cast_members WHERE movieId = :movieId""")
+    suspend fun getCastForMovie(movieId: String): List<ActorEntry>
+
+    @Query("SELECT * FROM quiz_results ORDER BY score DESC LIMIT 1")
+    suspend fun getBestQuizScore(): QuizResultEntity?
+
+    @Query("""SELECT COUNT(*) FROM quiz_results""")
+    suspend fun getQuizCount(): Int
+
+    @Query("""SELECT * FROM quiz_results ORDER BY date DESC""")
+    fun getAllQuizResults(): Flow<List<QuizResultEntity>>
 
     @Transaction
     suspend fun fullMovieUpdate(

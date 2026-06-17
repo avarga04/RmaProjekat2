@@ -1,6 +1,7 @@
 package com.example.rmaprojekat2.data.local
 
 import androidx.room.*
+import com.example.rmaprojekat2.data.domain.quiz.QuizResult
 
 @Database(
     entities = [
@@ -9,8 +10,9 @@ import androidx.room.*
         MovieCategoryJoin::class,
         ActorEntry::class,
         ImageEntry::class,
+        QuizResultEntity::class,
     ],
-    version = 1
+    version = 2
 )
 @TypeConverters(DateAdapter::class)
 actual abstract class MovieDB : RoomDatabase() {

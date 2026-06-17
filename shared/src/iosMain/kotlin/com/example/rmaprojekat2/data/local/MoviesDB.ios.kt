@@ -11,8 +11,9 @@ import kotlinx.coroutines.IO
         MovieCategoryJoin::class,
         ActorEntry::class,
         ImageEntry::class,
+        QuizResultEntity::class,
     ],
-    version = 1
+    version = 2
 )
 @TypeConverters(DateAdapter::class)
 @ConstructedBy(MovieDbConstructor::class)

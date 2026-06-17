@@ -1,12 +1,15 @@
 package com.example.rmaprojekat2.di
 
 import com.example.rmaprojekat2.data.local.MovieDB
+import com.example.rmaprojekat2.data.local.MovieDao
 import com.example.rmaprojekat2.data.remote.MovieService
 import com.example.rmaprojekat2.data.remote.createMovieService
 import com.example.rmaprojekat2.data.repo.NetworkMovieCatalog
 import com.example.rmaprojekat2.data.repo.MovieCatalog
+import com.example.rmaprojekat2.data.repo.QuizRepository
 import com.example.rmaprojekat2.ui.details.DetailViewModel
 import com.example.rmaprojekat2.ui.home.HomeViewModel
+import com.example.rmaprojekat2.ui.quiz.QuizViewModel
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -62,6 +65,10 @@ private val repositoryModule = module {
             db = get()
         )
     }
+    single<MovieDao> { get<MovieDB>().movieDao() }
+    single<QuizRepository> {
+        QuizRepository(movieDao = get())
+    }
 }
 
 private val viewModelModule = module {
@@ -72,6 +79,7 @@ private val viewModelModule = module {
             repo = get()
         )
     }
+    factory { QuizViewModel(quizRepository = get()) }
 }
 
 fun initKoin(appDeclaration: KoinAppDeclaration? = null) {

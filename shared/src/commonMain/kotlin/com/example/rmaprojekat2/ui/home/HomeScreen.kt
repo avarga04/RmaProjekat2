@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,6 +36,7 @@ fun HomeScreen(
     state: StateFlow<HomeViewState>,
     onAction: (HomeAction) -> Unit,
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToQuiz: ()-> Unit,
     sideEffects: SharedFlow<HomeSideEffect>
 ) {
     val currentState by state.collectAsStateWithLifecycle()
@@ -63,6 +65,15 @@ fun HomeScreen(
                     containerColor = PrimaryColor
                 ),
                 actions = {
+                    IconButton(
+                        onClick = onNavigateToQuiz,
+                        modifier = Modifier
+                            .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                            .size(50.dp)
+                    ) {
+                        Text("Quiz", fontSize = 20.sp)
+                    }
+
                     FilledTonalButton(
                         onClick = { onAction(HomeAction.ShowFilter) },
                         shape = RoundedCornerShape(20.dp),
@@ -99,7 +110,6 @@ private fun HomeContent(
             .background(BackgroundColor)
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        // Sort section - BEZ dugmeta za up/down
         SortSection(
             current = state.currentSort,
             onSortChange = { onAction(HomeAction.ChangeSort(it)) }
@@ -107,7 +117,6 @@ private fun HomeContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Results count
         Text(
             text = "${state.entries.size} movies found",
             style = MaterialTheme.typography.bodyMedium,

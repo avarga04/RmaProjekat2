@@ -82,6 +82,9 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation("org.xerial:sqlite-jdbc:3.44.1.0")
             implementation("androidx.sqlite:sqlite-bundled:2.4.0")
+            implementation("org.xerial:sqlite-jdbc:3.44.1.0")
+            implementation("androidx.sqlite:sqlite-bundled:2.4.0")
+            implementation("org.xerial:sqlite-jdbc:3.44.1.0")
 
         }
         iosMain.dependencies {
@@ -98,7 +101,7 @@ tasks.matching {
 
 
 android {
-    namespace = "com.example.projekat1"
+    namespace = "com.example.rmaprojekat2"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
@@ -130,6 +133,7 @@ room {
 
 dependencies {
     add("kspCommonMainMetadata", libs.ktorfit.ksp)
+    add("kspCommonMainMetadata", libs.room.compiler)
     listOf(
         "kspAndroid",
         "kspJvm",

@@ -11,6 +11,8 @@ import com.example.rmaprojekat2.ui.details.DetailScreen
 import com.example.rmaprojekat2.ui.details.DetailViewModel
 import com.example.rmaprojekat2.ui.home.HomeScreen
 import com.example.rmaprojekat2.ui.home.HomeViewModel
+import com.example.rmaprojekat2.ui.quiz.QuizScreen
+import com.example.rmaprojekat2.ui.quiz.QuizViewModel
 import kotlinx.serialization.Serializable
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -20,6 +22,9 @@ internal object HomeNode
 
 @Serializable
 internal data class DetailNode(val movieKey: String)
+
+@Serializable
+internal object QuizNode
 
 @Composable
 fun App() {
@@ -39,6 +44,9 @@ fun App() {
                             popUpTo(navHandler.graph.findStartDestination().id) { saveState = true }
                         }
                     },
+                    onNavigateToQuiz = {
+                        navHandler.navigate(QuizNode)
+                    },
                     sideEffects = vm.sideEffects
                 )
             }
@@ -52,6 +60,19 @@ fun App() {
                     onAction = vm::dispatch,
                     onGoBack = { navHandler.popBackStack() },
                     sideEffects = vm.sideEffects
+                )
+            }
+
+            composable<QuizNode> {
+                val vm = koinViewModel<QuizViewModel>()
+                QuizScreen(
+                    state = vm.uiState,
+                    onAction = vm::dispatch,
+                    effects = vm.effects,
+                    onNavigateToResult = { result ->
+                        navHandler.popBackStack()
+                    },
+                    onNavigateBack = { navHandler.popBackStack() }
                 )
             }
         }

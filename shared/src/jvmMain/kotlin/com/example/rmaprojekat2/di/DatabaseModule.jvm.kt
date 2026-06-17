@@ -15,6 +15,7 @@ actual fun databaseModule(): Module = module {
             name = dbFile.absolutePath
         )
         builder.setDriver(BundledSQLiteDriver())
+        builder.fallbackToDestructiveMigration(true)
         buildMovieDB(builder)
     }
 }
