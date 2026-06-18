@@ -37,8 +37,8 @@ fun HomeScreen(
     onAction: (HomeAction) -> Unit,
     onNavigateToDetail: (String) -> Unit,
     onNavigateToQuiz: ()-> Unit,
-    onLogout: () -> Unit,
-    sideEffects: SharedFlow<HomeSideEffect>
+    sideEffects: SharedFlow<HomeSideEffect>,
+    onLogout: () -> Unit
 ) {
     val currentState by state.collectAsStateWithLifecycle()
     var viewMode by remember { mutableStateOf("list") }
@@ -47,7 +47,7 @@ fun HomeScreen(
         sideEffects.collect { effect ->
             when (effect) {
                 is HomeSideEffect.GoToDetail -> onNavigateToDetail(effect.movieId)
-                HomeSideEffect.Logout -> onLogout()
+                HomeSideEffect.Logout ->  onLogout()
             }
         }
     }

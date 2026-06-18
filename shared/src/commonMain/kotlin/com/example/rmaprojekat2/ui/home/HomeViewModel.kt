@@ -2,12 +2,14 @@ package com.example.rmaprojekat2.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.rmaprojekat2.data.repo.AuthRepository
 import com.example.rmaprojekat2.data.repo.MovieCatalog
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val catalog: MovieCatalog
+    private val catalog: MovieCatalog,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val actionFlow = MutableSharedFlow<HomeAction>()
@@ -48,10 +50,16 @@ class HomeViewModel(
                     HomeAction.CommitFilters -> commitFilters()
                     HomeAction.ResetFilters -> resetDraftWhileOpen()
                     is HomeAction.SelectMovie -> emitEffect(HomeSideEffect.GoToDetail(action.id))
-                    HomeAction.Logout -> emitEffect(HomeSideEffect.Logout as HomeSideEffect)
+                    HomeAction.Logout -> performLogout()
                     else -> {}
                 }
             }
+        }
+    }
+    private fun performLogout() {
+        viewModelScope.launch {
+            authRepository.logout()
+            emitEffect(HomeSideEffect.Logout)
         }
     }
 

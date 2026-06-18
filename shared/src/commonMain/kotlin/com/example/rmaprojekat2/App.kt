@@ -31,11 +31,10 @@ internal data class DetailNode(val movieKey: String)
 @Serializable
 internal object QuizNode
 
-
 @Composable
 fun App() {
     val navHandler = rememberNavController()
-    val authViewModel = koinViewModel<AuthViewModel>()
+    //val authViewModel = koinViewModel<AuthViewModel>()
 
     MaterialTheme {
         NavHost(navController = navHandler, startDestination = AuthNode) {
@@ -68,15 +67,13 @@ fun App() {
                     onNavigateToQuiz = {
                         navHandler.navigate(QuizNode)
                     },
+
+                    sideEffects = vm.sideEffects,
                     onLogout = {
-
-                        authViewModel.logout()
-
                         navHandler.navigate(AuthNode) {
                             popUpTo(0) { inclusive = true }
                         }
-                    },
-                    sideEffects = vm.sideEffects
+                    }
                 )
             }
 

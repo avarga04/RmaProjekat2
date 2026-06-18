@@ -94,7 +94,7 @@ private val repositoryModule = module {
 }
 
 private val viewModelModule = module {
-    viewModelOf(::HomeViewModel)
+    factory { HomeViewModel(catalog = get(), authRepository = get()) }
     factory { params ->
         DetailViewModel(
             movieId = params.get(),
