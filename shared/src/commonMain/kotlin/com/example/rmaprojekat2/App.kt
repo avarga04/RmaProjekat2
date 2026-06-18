@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.rmaprojekat2.ui.auth.AuthScreen
+import com.example.rmaprojekat2.ui.auth.AuthViewModel
 import com.example.rmaprojekat2.ui.details.DetailScreen
 import com.example.rmaprojekat2.ui.details.DetailViewModel
 import com.example.rmaprojekat2.ui.home.HomeScreen
@@ -18,6 +20,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Serializable
+internal object AuthNode
+
+@Serializable
 internal object HomeNode
 
 @Serializable
@@ -26,12 +31,28 @@ internal data class DetailNode(val movieKey: String)
 @Serializable
 internal object QuizNode
 
+
 @Composable
 fun App() {
     val navHandler = rememberNavController()
+    val authViewModel = koinViewModel<AuthViewModel>()
 
     MaterialTheme {
-        NavHost(navController = navHandler, startDestination = HomeNode) {
+        NavHost(navController = navHandler, startDestination = AuthNode) {
+            composable<AuthNode> {
+                val vm = koinViewModel<AuthViewModel>()
+                AuthScreen(
+                    state = vm.uiState,
+                    onAction = vm::dispatch,
+                    effects = vm.effects,
+                    onNavigateToHome = {
+                        navHandler.navigate(HomeNode) {
+                            popUpTo(AuthNode) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
             composable<HomeNode> {
                 val vm = koinViewModel<HomeViewModel>()
                 HomeScreen(
@@ -46,6 +67,14 @@ fun App() {
                     },
                     onNavigateToQuiz = {
                         navHandler.navigate(QuizNode)
+                    },
+                    onLogout = {
+
+                        authViewModel.logout()
+
+                        navHandler.navigate(AuthNode) {
+                            popUpTo(0) { inclusive = true }
+                        }
                     },
                     sideEffects = vm.sideEffects
                 )

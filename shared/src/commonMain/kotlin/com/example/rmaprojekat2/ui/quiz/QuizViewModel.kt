@@ -25,8 +25,6 @@ class QuizViewModel(
     private var timerJob: kotlinx.coroutines.Job? = null
     private var startTime: Long = 0
 
-    private var isTransitioning = false
-
     init {
         collectActions()
     }
@@ -89,7 +87,7 @@ class QuizViewModel(
     private fun startQuiz() {
         startTime = Clock.System.now().toEpochMilliseconds()
         _state.update { it.copy(
-            timeRemaining = QuizGenerator.TIME_LIMIT_SECONDS  // SADA RADI
+            timeRemaining = QuizGenerator.TIME_LIMIT_SECONDS
         ) }
         startTimer()
     }
@@ -114,7 +112,7 @@ class QuizViewModel(
 
     private fun selectAnswer(questionIndex: Int, optionIndex: Int) {
         val currentState = _state.value
-        if (currentState.isAnswerRevealed || currentState.isFinished || isTransitioning) return
+        if (currentState.isAnswerRevealed || currentState.isFinished) return
 
         val question = currentState.questions.getOrNull(questionIndex) ?: return
 
@@ -144,7 +142,6 @@ class QuizViewModel(
                 )
             }
         }
-        isTransitioning = false
     }
 
     private fun finishQuiz() {

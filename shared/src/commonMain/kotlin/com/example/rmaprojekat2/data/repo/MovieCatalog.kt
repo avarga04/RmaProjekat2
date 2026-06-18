@@ -11,4 +11,8 @@ interface MovieCatalog {
     fun observeGenres(): Flow<List<GenreOption>>
     suspend fun refresh()
     suspend fun refreshOneMovie(movieId: String)
+
+    suspend fun getMoviesPaged(page: Int, pageSize: Int = 20): List<MovieSummary>
+
+    suspend fun getTotalMoviesCount(): Int
 }

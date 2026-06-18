@@ -57,7 +57,8 @@ fun QuizQuestionScreen(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -140,7 +141,7 @@ private fun QuizHeader(
     onAbandon: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 40.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

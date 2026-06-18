@@ -2,11 +2,16 @@ package com.example.rmaprojekat2.di
 
 import com.example.rmaprojekat2.data.local.MovieDB
 import com.example.rmaprojekat2.data.local.MovieDao
+import com.example.rmaprojekat2.data.local.TokenDataStore
+import com.example.rmaprojekat2.data.remote.AuthApi
 import com.example.rmaprojekat2.data.remote.MovieService
+import com.example.rmaprojekat2.data.remote.createAuthApi
 import com.example.rmaprojekat2.data.remote.createMovieService
+import com.example.rmaprojekat2.data.repo.AuthRepository
 import com.example.rmaprojekat2.data.repo.NetworkMovieCatalog
 import com.example.rmaprojekat2.data.repo.MovieCatalog
 import com.example.rmaprojekat2.data.repo.QuizRepository
+import com.example.rmaprojekat2.ui.auth.AuthViewModel
 import com.example.rmaprojekat2.ui.details.DetailViewModel
 import com.example.rmaprojekat2.ui.home.HomeViewModel
 import com.example.rmaprojekat2.ui.quiz.QuizViewModel
@@ -17,7 +22,9 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.NonCancellable.get
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.viewModelOf
@@ -33,10 +40,15 @@ private val networkModule = module {
         }
     }
 
-    single {
+
+    single <HttpClient>{
         HttpClient {
             install(ContentNegotiation) {
                 json(get())
+            }
+            install(io.ktor.client.plugins.DefaultRequest) {
+                header("Content-Type", "application/json")
+                header("Accept", "application/json")
             }
             install(Logging) {
                 level = LogLevel.ALL
@@ -47,6 +59,14 @@ private val networkModule = module {
                 }
             }
         }
+    }
+
+    single<AuthApi> {
+        Ktorfit.Builder()
+            .httpClient(get<HttpClient>())
+            .baseUrl("https://rma.finlab.rs/")
+            .build()
+            .createAuthApi()
     }
 
     single<MovieService> {
@@ -69,6 +89,8 @@ private val repositoryModule = module {
     single<QuizRepository> {
         QuizRepository(movieDao = get())
     }
+    single<TokenDataStore> { TokenDataStore() }
+    single<AuthRepository> { AuthRepository(authApi = get(), tokenStore = get()) }
 }
 
 private val viewModelModule = module {
@@ -80,6 +102,7 @@ private val viewModelModule = module {
         )
     }
     factory { QuizViewModel(quizRepository = get()) }
+    factory { AuthViewModel(authRepository = get()) }
 }
 
 fun initKoin(appDeclaration: KoinAppDeclaration? = null) {

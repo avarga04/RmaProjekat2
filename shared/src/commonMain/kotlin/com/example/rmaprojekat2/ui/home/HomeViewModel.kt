@@ -48,6 +48,8 @@ class HomeViewModel(
                     HomeAction.CommitFilters -> commitFilters()
                     HomeAction.ResetFilters -> resetDraftWhileOpen()
                     is HomeAction.SelectMovie -> emitEffect(HomeSideEffect.GoToDetail(action.id))
+                    HomeAction.Logout -> emitEffect(HomeSideEffect.Logout as HomeSideEffect)
+                    else -> {}
                 }
             }
         }
@@ -152,5 +154,6 @@ class HomeViewModel(
     private fun emitEffect(effect: HomeSideEffect) {
         viewModelScope.launch { sideEffectFlow.emit(effect) }
     }
+
 
 }

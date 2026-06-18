@@ -37,14 +37,17 @@ fun HomeScreen(
     onAction: (HomeAction) -> Unit,
     onNavigateToDetail: (String) -> Unit,
     onNavigateToQuiz: ()-> Unit,
+    onLogout: () -> Unit,
     sideEffects: SharedFlow<HomeSideEffect>
 ) {
     val currentState by state.collectAsStateWithLifecycle()
+    var viewMode by remember { mutableStateOf("list") }
 
     LaunchedEffect(Unit) {
         sideEffects.collect { effect ->
             when (effect) {
                 is HomeSideEffect.GoToDetail -> onNavigateToDetail(effect.movieId)
+                HomeSideEffect.Logout -> onLogout()
             }
         }
     }
@@ -65,14 +68,54 @@ fun HomeScreen(
                     containerColor = PrimaryColor
                 ),
                 actions = {
-                    IconButton(
-                        onClick = onNavigateToQuiz,
-                        modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.2f), CircleShape)
-                            .size(50.dp)
+
+                    FilledTonalButton(
+                        onClick = { onAction(HomeAction.Logout) },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f)
+                        )
                     ) {
-                        Text("Quiz", fontSize = 20.sp)
+                        Text(
+                            text = "Logout",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
                     }
+
+                    Spacer(modifier = Modifier.width(4.dp))
+                    FilledTonalButton(
+                        onClick = { viewMode = if (viewMode == "list") "pager" else "list" },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f)
+                        )
+                    ) {
+                        Text(
+                            text = if (viewMode == "list") "Pager" else "List",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    FilledTonalButton(
+                        onClick = onNavigateToQuiz,
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f)
+                        )
+                    ) {
+                        Text(
+                            text = "Quiz",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    }
+
+
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     FilledTonalButton(
                         onClick = { onAction(HomeAction.ShowFilter) },
@@ -93,6 +136,7 @@ fun HomeScreen(
         HomeContent(
             state = currentState,
             onAction = onAction,
+            viewMode = viewMode,
             modifier = Modifier.padding(padding)
         )
     }
@@ -102,6 +146,7 @@ fun HomeScreen(
 private fun HomeContent(
     state: HomeViewState,
     onAction: (HomeAction) -> Unit,
+    viewMode: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -130,6 +175,10 @@ private fun HomeContent(
             state.busy -> FullScreenLoader()
             state.errorText != null -> ErrorView(state.errorText) { onAction(HomeAction.Retry) }
             state.hasNoEntries -> EmptyView()
+            viewMode == "pager" -> PagerMoviesScreen(
+                movies = state.entries,
+                onMovieClick = { onAction(HomeAction.SelectMovie(it)) }
+            )
             else -> MovieGrid(state.entries, onAction)
         }
 
@@ -294,7 +343,7 @@ private fun MoviePosterCard(movie: MovieSummary, onClick: () -> Unit) {
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "⭐", fontSize = 14.sp)
+                    Text(text = "", fontSize = 14.sp)
                     Text(
                         text = "${movie.imdbRating}",
                         style = MaterialTheme.typography.bodyMedium,

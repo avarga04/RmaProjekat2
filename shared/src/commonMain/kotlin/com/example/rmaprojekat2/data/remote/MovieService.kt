@@ -1,7 +1,9 @@
 package com.example.rmaprojekat2.data.remote
 
 import de.jensklingenberg.ktorfit.Ktorfit
+import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.POST
 import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
@@ -35,4 +37,17 @@ interface MovieService {
     @GET("movies/{id}")
     suspend fun loadMovieDetails(@Path("id") id: String): RawMovieDetails
 
+    @POST("auth/login")
+    suspend fun login(
+        @Body request: LoginRequestDto
+    ): LoginResponseDto
+
+    @POST("auth/register")
+    suspend fun register(
+        @Body request: RegisterRequestDto
+    ): RegisterResponseDto
+
+    @POST("auth/logout")
+    suspend fun logout()
 }
+

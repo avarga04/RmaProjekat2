@@ -15,6 +15,7 @@ sealed class HomeAction {
     data object CommitFilters : HomeAction()
     data object ResetFilters : HomeAction()
     data class SelectMovie(val id: String) : HomeAction()
+    data object Logout : HomeAction()
 }
 
 data class HomeViewState(
@@ -34,6 +35,7 @@ data class HomeViewState(
 
 sealed class HomeSideEffect {
     data class GoToDetail(val movieId: String) : HomeSideEffect()
+    data object Logout : HomeSideEffect()
 }
 
 

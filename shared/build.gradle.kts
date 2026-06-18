@@ -38,6 +38,10 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.room.runtime.android)
+            implementation("androidx.datastore:datastore-preferences:1.1.1")
+            implementation("androidx.datastore:datastore:1.1.1")
+            implementation("androidx.datastore:datastore-preferences-core:1.1.1")
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

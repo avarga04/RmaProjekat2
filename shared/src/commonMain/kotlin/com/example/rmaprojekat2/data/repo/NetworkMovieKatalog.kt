@@ -72,4 +72,14 @@ class NetworkMovieCatalog(
             images = imageEntities,
         )
     }
+
+    override suspend fun getMoviesPaged(page: Int, pageSize: Int): List<MovieSummary> {
+        val offset = page * pageSize
+        return db.movieDao().getMoviesPaged(pageSize, offset)
+            .map { it.toSummary() }
+    }
+
+    override suspend fun getTotalMoviesCount(): Int {
+        return db.movieDao().getMoviesCount()
+    }
 }

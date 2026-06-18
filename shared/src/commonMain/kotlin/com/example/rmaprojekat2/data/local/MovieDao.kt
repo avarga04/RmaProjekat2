@@ -17,6 +17,12 @@ interface MovieDao {
     @Query("SELECT * FROM genres ORDER BY name ASC")
     fun fetchAllGenres(): Flow<List<CategoryEntry>>
 
+    @Query("SELECT * FROM movies ORDER BY imdbRating DESC LIMIT :limit OFFSET :offset")
+    suspend fun getMoviesPaged(limit: Int = 20, offset: Int = 0): List<MovieDetails>
+
+    @Query("SELECT COUNT(*) FROM movies")
+    suspend fun getMoviesCount(): Int
+
     @Upsert
     suspend fun storeImages(images: List<ImageEntry>)
 
